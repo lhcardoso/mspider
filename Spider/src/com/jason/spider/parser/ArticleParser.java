@@ -1,5 +1,7 @@
 package com.jason.spider.parser;
 
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,9 +12,8 @@ import org.htmlparser.filters.AndFilter;
 import org.htmlparser.filters.HasAttributeFilter;
 import org.htmlparser.filters.NodeClassFilter;
 import org.htmlparser.filters.TagNameFilter;
-import org.htmlparser.nodes.TagNode;
+import org.htmlparser.http.ConnectionManager;
 import org.htmlparser.tags.Div;
-import org.htmlparser.tags.HeadingTag;
 import org.htmlparser.tags.LinkTag;
 import org.htmlparser.tags.Span;
 import org.htmlparser.util.NodeList;
@@ -26,7 +27,6 @@ import com.jason.spider.util.Queue;
 public class ArticleParser implements Parser {
 
 	protected static final String lineSign = System.getProperty("line.separator");
-	protected static final String encoding = "gb2312";
 	protected static final int lineSign_size = lineSign.length();
 	
 	private Rule rule;
@@ -44,10 +44,10 @@ public class ArticleParser implements Parser {
 	 * 
 	 */
 	public Msg process(String url) {
-		System.out.println(url);
+		//System.out.println(url);
 		String title = processTitle(url);
 		String content = processContent(url);
-		//System.out.println(content);
+		System.out.println(content);
 		
 		processLink(url);
 		return null;
@@ -63,7 +63,7 @@ public class ArticleParser implements Parser {
 			String siteUrl = getLinkUrl(url);
 			AndFilter andFilter = new AndFilter();
 			org.htmlparser.Parser parser = new org.htmlparser.Parser(siteUrl);
-			parser.setEncoding(encoding);
+			parser.setEncoding(rule.getEncoding());
 			parser.reset();
 			andFilter.setPredicates(new NodeFilter[]{new NodeClassFilter(LinkTag.class)});
 			NodeList list = parser.extractAllNodesThatMatch(andFilter);
@@ -108,7 +108,11 @@ public class ArticleParser implements Parser {
 		try {
 			org.htmlparser.Parser parser = new org.htmlparser.Parser(url);
 			parser.reset();
-			parser.setEncoding(encoding);
+			ConnectionManager cm = parser.getConnectionManager();
+			Hashtable<String,Object> props = new Hashtable<String,Object>();
+			props.put("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows XP; DigExt)");
+			cm.setRequestProperties(props);
+			parser.setEncoding(rule.getEncoding());
 			NodeFilter nodeFilter = null;
 			if(rule.getContentTag() != null){
 				AndFilter andFilter = new AndFilter();

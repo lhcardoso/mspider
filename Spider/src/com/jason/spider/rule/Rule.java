@@ -2,6 +2,8 @@ package com.jason.spider.rule;
 
 public class Rule {
 	
+	private String encoding;
+	
 	private String contentTag;
 	
 	private String contentTagId;
@@ -30,6 +32,14 @@ public class Rule {
 
 	public void setContentTagClass(String contentTagClass) {
 		this.contentTagClass = contentTagClass;
+	}
+
+	public String getEncoding() {
+		return encoding;
+	}
+
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
 	}
 	
 	
