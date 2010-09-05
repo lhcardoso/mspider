@@ -7,6 +7,7 @@ import com.jason.spider.parser.ArticleParser;
 import com.jason.spider.parser.Parser;
 import com.jason.spider.rule.Rule;
 import com.jason.spider.rule.SinaRule;
+import com.jason.spider.rule._163Rule;
 
 public class Laucher {
 	
@@ -17,7 +18,7 @@ public class Laucher {
 		
 		//163
 		String _163url = "http://news.163.com/10/0905/01/6FPHM79P000146BD.html";
-		Rule _163Rule = new SinaRule();
+		Rule _163Rule = new _163Rule();
 		_163Rule.setContentTag("div");
 		_163Rule.setContentTagId("endText");
 		urls.add(_163url);
@@ -32,7 +33,6 @@ public class Laucher {
 		rules.add(sinaRule);
 		
 		for(Rule rule:rules){
-			
 			Parser parser = new ArticleParser();
 			parser.setRule(rule);
 			parsers.add(parser);
