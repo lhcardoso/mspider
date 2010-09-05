@@ -44,10 +44,10 @@ public class ArticleParser implements Parser {
 	 * 
 	 */
 	public Msg process(String url) {
-		
+		System.out.println(url);
 		String title = processTitle(url);
 		String content = processContent(url);
-		System.out.println(content);
+		//System.out.println(content);
 		
 		processLink(url);
 		return null;
