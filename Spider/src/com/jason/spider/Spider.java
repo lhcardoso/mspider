@@ -17,6 +17,20 @@ public class Spider {
 	
 	private static final int WORKER_SIZE = 5;
 	
+	public Spider(List<String> urls,Parser parser){
+		for(String url :urls){
+			Queue.add(url);
+		}
+		this.parsers.add(parser);
+	}
+	
+	public Spider(List<String> urls,List<Parser> parsers){
+		for(String url :urls){
+			Queue.add(url);
+		}
+		this.parsers.addAll(parsers);
+	}
+	
 	
 	public Spider(String url,Parser parser){
 		this(DEFAULT_POOL_SIZE,url,parser);
