@@ -52,9 +52,11 @@ public class Spider {
 	
 	public void start(){
 		for(Parser parser : parsers){
-			Worker worker = new Worker(parser);
 			WorkerPool pool = WorkerPool.getInstance();
-			pool.fire(worker);
+			for(int i=0;i<WORKER_SIZE;i++){
+				Worker worker = new Worker(parser);
+				pool.fire(worker);
+			}
 		}
 	}
 

@@ -9,18 +9,19 @@ public class Queue {
 
 	static ReentrantLock lock = new ReentrantLock();
 
-	public static void add(String t) {
+	public static  void add(String t) {
 		if (queue.contains(t)) {
 			return;
 		}
 		queue.addLast(t);
+		
 	}
 
-	public static String get() {
+	public synchronized static String get() {
 
-		lock.lock();
+		//lock.lock();
 		String url = queue.removeFirst();
-		lock.unlock();
+		//lock.unlock();
 		return url;
 	}
 

@@ -44,10 +44,10 @@ public class ArticleParser implements Parser {
 	 * 
 	 */
 	public Msg process(String url) {
-		//System.out.println(url);
+		System.out.println(url);
 		String title = processTitle(url);
 		String content = processContent(url);
-		System.out.println(content);
+		//System.out.println(content);
 		
 		processLink(url);
 		return null;
@@ -74,9 +74,6 @@ public class ArticleParser implements Parser {
 					String linkUrl = linkTag.getLink();
 					Queue.add(linkUrl);
 					
-					Worker worker = new Worker(this);
-					WorkerPool pool = WorkerPool.getInstance();
-					pool.fire(worker);
 				}
 			}
 		}catch(Exception e){
