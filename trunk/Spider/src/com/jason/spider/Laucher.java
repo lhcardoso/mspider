@@ -18,30 +18,32 @@ public class Laucher {
 		List<Parser> parsers = new LinkedList<Parser>();
 		
 		//163
-		/*String _163url = "http://news.163.com/10/0905/01/6FPHM79P000146BD.html";
+		String _163url = "http://news.163.com/10/0905/01/6FPHM79P000146BD.html";
 		Rule _163Rule = new _163Rule();
+		_163Rule.setEncoding("gb2312");
 		_163Rule.setContentTag("div");
 		_163Rule.setContentTagId("endText");
 		urls.add(_163url);
-		rules.add(_163Rule);*/
+		rules.add(_163Rule);
 		
 		//新浪.
-		String sinaurl = "http://gd.news.sina.com.cn/news/2010/09/04/989563.html";
+		/*String sinaurl = "http://gd.news.sina.com.cn/news/2010/09/04/989563.html";
+	
 		Rule sinaRule = new SinaRule();
 		sinaRule.setEncoding("gb2312");
 		sinaRule.setContentTag("div");
-		sinaRule.setContentTagId("artibody1");
+		sinaRule.setContentTagId("artibody1");h
 		urls.add(sinaurl);
-		rules.add(sinaRule);
+		rules.add(sinaRule);*/
 		
 		//csdn博客
-		String csdnBlogUrl = "http://blog.csdn.net/cping1982/archive/2010/08/14/5811779.aspx";
+		/*String csdnBlogUrl = "http://blog.csdn.net/cping1982/archive/2010/08/14/5811779.aspx";
 		Rule csdnBlogRule = new CsdnBlogRule();
 		csdnBlogRule.setEncoding("utf-8");
 		csdnBlogRule.setContentTag("div");
 		csdnBlogRule.setContentTagClass("blogstory");
 		urls.add(csdnBlogUrl);
-		rules.add(csdnBlogRule);
+		rules.add(csdnBlogRule);*/
 		
 		for(Rule rule:rules){
 			Parser parser = new ArticleParser();
