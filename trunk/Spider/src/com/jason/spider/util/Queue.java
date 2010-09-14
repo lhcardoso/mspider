@@ -15,10 +15,21 @@ public class Queue {
 	
 
 	public static  void add(String t) {
-		if (queue.contains(t)) {
-			return;
+		lock.lock();
+		try{
+			if (queue.contains(t)) {
+				return;
+			}
+			if(queue.size() == 0){
+				notEmpty.signalAll();
+			}
+			queue.addLast(t);
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			lock.unlock();
 		}
-		queue.addLast(t);
+		
 		
 	}
 
