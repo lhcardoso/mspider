@@ -1,7 +1,6 @@
 package com.jason.spider.parser;
 
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,6 +13,7 @@ import org.htmlparser.filters.NodeClassFilter;
 import org.htmlparser.filters.TagNameFilter;
 import org.htmlparser.http.ConnectionManager;
 import org.htmlparser.tags.Div;
+import org.htmlparser.tags.HeadingTag;
 import org.htmlparser.tags.LinkTag;
 import org.htmlparser.tags.Span;
 import org.htmlparser.util.NodeList;
@@ -47,8 +47,7 @@ public class ArticleParser implements Parser {
 		System.out.println(url);
 		String title = processTitle(url);
 		String content = processContent(url);
-		//System.out.println(content);
-		
+		System.out.println(title);
 		processLink(url);
 		return null;
 	}
@@ -89,8 +88,54 @@ public class ArticleParser implements Parser {
 	 * @return
 	 */
 	public String processTitle(String url){
-		
-		return null;
+		String text = "";
+		try {
+			org.htmlparser.Parser parser = new org.htmlparser.Parser(url);
+			parser.reset();
+			ConnectionManager cm = parser.getConnectionManager();
+			Hashtable<String,Object> props = new Hashtable<String,Object>();
+			props.put("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows XP; DigExt)");
+			cm.setRequestProperties(props);
+			parser.setEncoding(rule.getEncoding());
+			NodeFilter nodeFilter = null;
+			if(rule.getContentTag() != null){
+				AndFilter andFilter = new AndFilter();
+				TagNameFilter titleFilter = new TagNameFilter(rule.getTitleTag());
+				Vector<NodeFilter> titleNodeFilterVector = new Vector<NodeFilter>();
+				titleNodeFilterVector.add(titleFilter);
+				if(rule.getTitleTagId() != null){
+					HasAttributeFilter idAttribute = new HasAttributeFilter("id", rule.getTitleTagId());
+					titleNodeFilterVector.add(idAttribute);
+				}
+				if(rule.getTitleTagClass() != null){
+					HasAttributeFilter classAttribute = new HasAttributeFilter("class", rule.getTitleTagClass());
+					titleNodeFilterVector.add(classAttribute);
+				}
+				NodeFilter[] titleNodeFilter = new NodeFilter[titleNodeFilterVector.size()];
+				andFilter.setPredicates(titleNodeFilterVector.toArray(titleNodeFilter));
+				nodeFilter = andFilter;
+			}
+			
+			StringBuilder builder = new StringBuilder();
+			NodeList list = parser.extractAllNodesThatMatch(nodeFilter);
+			for (int i = 0; i < list.size(); i++) {
+				Node node = list.elementAt(i);
+				if (node instanceof Div) {
+					Div nodeTag = (Div) node;
+					builder.append(nodeTag.getStringText());
+				} else if (node instanceof Span) {
+					Span nodeTag = (Span) node;
+					builder.append(nodeTag.getStringText());
+				}else if (node instanceof HeadingTag) {
+					HeadingTag nodeTag = (HeadingTag) node;
+					builder.append(nodeTag.getStringText());
+				}
+			}
+			text = builder.toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return text;
 	}
 	
 	
