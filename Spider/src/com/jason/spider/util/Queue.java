@@ -1,13 +1,18 @@
 package com.jason.spider.util;
 
 import java.util.LinkedList;
+import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Queue {
 
 	private static LinkedList<String> queue = new LinkedList<String>();
 
-	static ReentrantLock lock = new ReentrantLock();
+	private static ReentrantLock lock = new ReentrantLock();
+	
+	
+	private static Condition notEmpty = lock.newCondition();
+	
 
 	public static  void add(String t) {
 		if (queue.contains(t)) {
@@ -17,12 +22,21 @@ public class Queue {
 		
 	}
 
-	public synchronized static String get() {
-
-		//lock.lock();
-		String url = queue.removeFirst();
-		//lock.unlock();
-		return url;
+	public  static String get() {
+		lock.lock();
+		try{
+			if(queue.size()==0){
+				notEmpty.await();
+			}
+			String url = queue.poll();
+			return url;
+		}catch(Exception e){
+			e.printStackTrace();
+			return null;
+		}finally{
+			lock.unlock();
+		}
+		
 	}
 
 	public static boolean isEmpty() {

@@ -9,6 +9,12 @@ public class Rule {
 	private String contentTagId;
 	
 	private String contentTagClass;
+	
+	private String titleTag;
+	
+	private String titleTagId;
+	
+	private String titleTagClass;
 
 	public String getContentTag() {
 		return contentTag;
@@ -40,6 +46,30 @@ public class Rule {
 
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
+	}
+
+	public String getTitleTag() {
+		return titleTag;
+	}
+
+	public void setTitleTag(String titleTag) {
+		this.titleTag = titleTag;
+	}
+
+	public String getTitleTagId() {
+		return titleTagId;
+	}
+
+	public void setTitleTagId(String titleTagId) {
+		this.titleTagId = titleTagId;
+	}
+
+	public String getTitleTagClass() {
+		return titleTagClass;
+	}
+
+	public void setTitleTagClass(String titleTagClass) {
+		this.titleTagClass = titleTagClass;
 	}
 	
 	
