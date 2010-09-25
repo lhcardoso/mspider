@@ -12,16 +12,20 @@ public class Spider {
 	
 	private List<Parser> parsers = new LinkedList<Parser>();
 	
+	private ExecutorService executor;
 	
 	private static final int DEFAULT_POOL_SIZE = 10;
 	
 	private static final int WORKER_SIZE = 5;
+	
+	
 	
 	public Spider(List<String> urls,Parser parser){
 		for(String url :urls){
 			Queue.add(url);
 		}
 		this.parsers.add(parser);
+		executor = Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
 	}
 	
 	public Spider(List<String> urls,List<Parser> parsers){
@@ -29,6 +33,7 @@ public class Spider {
 			Queue.add(url);
 		}
 		this.parsers.addAll(parsers);
+		executor = Executors.newFixedThreadPool(DEFAULT_POOL_SIZE);
 	}
 	
 	
@@ -37,6 +42,7 @@ public class Spider {
 	}
 	
 	public Spider(int poolSize,String url,Parser parser){
+		executor = Executors.newFixedThreadPool(poolSize);
 		Queue.add(url);
 		parsers.add(parser);
 	}
@@ -52,11 +58,32 @@ public class Spider {
 	
 	public void start(){
 		for(Parser parser : parsers){
-			WorkerPool pool = WorkerPool.getInstance();
 			for(int i=0;i<WORKER_SIZE;i++){
 				Worker worker = new Worker(parser);
-				pool.fire(worker);
+				executor.execute(worker);
 			}
+		}
+	}
+	
+	private class Worker implements Runnable{
+		
+		private boolean isActivite = true;
+		
+		private Parser parser;
+		
+		public Worker(Parser parser){
+			this.parser = parser;
+			
+		}
+		
+
+		public void run() {
+			while(isActivite){
+				System.out.println("abc");
+				String url = Queue.get();
+				parser.process(url);
+			}
+			
 		}
 	}
 

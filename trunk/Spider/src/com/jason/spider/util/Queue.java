@@ -8,45 +8,41 @@ public class Queue {
 
 	private static LinkedList<String> queue = new LinkedList<String>();
 
-	private static ReentrantLock lock = new ReentrantLock();
+	//private static ReentrantLock lock = new ReentrantLock();
 	
+	private static Object lock = new Object();
 	
-	private static Condition notEmpty = lock.newCondition();
+	//private static Condition notEmpty = lock.newCondition();
 	
 
 	public static  void add(String t) {
-		lock.lock();
-		try{
-			if (queue.contains(t)) {
-				return;
+		synchronized(lock){
+			try{
+				if (queue.contains(t)) {
+					return;
+				}
+				queue.addLast(t);
+			}catch(Exception e){
+				e.printStackTrace();
 			}
-			if(queue.size() == 0){
-				notEmpty.signalAll();
-			}
-			queue.addLast(t);
-		}catch(Exception e){
-			e.printStackTrace();
-		}finally{
-			lock.unlock();
 		}
-		
 		
 	}
 
 	public  static String get() {
-		lock.lock();
-		try{
-			if(queue.size()==0){
-				notEmpty.await();
+		synchronized(lock){
+			try{
+				if(queue.size()==0){
+					lock.wait();
+				}
+				String url = queue.poll();
+				return url;
+			}catch(Exception e){
+				e.printStackTrace();
+				return null;
 			}
-			String url = queue.poll();
-			return url;
-		}catch(Exception e){
-			e.printStackTrace();
-			return null;
-		}finally{
-			lock.unlock();
 		}
+		
 		
 	}
 
