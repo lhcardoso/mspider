@@ -18,8 +18,6 @@ import org.htmlparser.tags.LinkTag;
 import org.htmlparser.tags.Span;
 import org.htmlparser.util.NodeList;
 
-import com.jason.spider.Worker;
-import com.jason.spider.WorkerPool;
 import com.jason.spider.msg.Msg;
 import com.jason.spider.rule.Rule;
 import com.jason.spider.util.Queue;
@@ -44,7 +42,7 @@ public class ArticleParser implements Parser {
 	 * 
 	 */
 	public Msg process(String url) {
-		System.out.println(url);
+		//System.out.println(url);
 		String title = processTitle(url);
 		String content = processContent(url);
 		System.out.println(title);
