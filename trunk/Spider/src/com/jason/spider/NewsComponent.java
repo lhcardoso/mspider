@@ -12,7 +12,6 @@ import com.jason.spider.parser.ArticleParser;
 import com.jason.spider.parser.Parser;
 import com.jason.spider.rule.NewsRule;
 import com.jason.spider.rule.Rule;
-import com.jason.spider.rule.SinaRule;
 import com.jason.spider.util.Constance;
 
 /***
@@ -24,6 +23,8 @@ import com.jason.spider.util.Constance;
 public class NewsComponent implements Component{
 	
 	private static final String news_rule_path = Constance.RULE_PATH +"/news";
+	
+	private NewsRule[] rules;
 	
 	/**
 	 * 构建相关规则.
@@ -54,6 +55,8 @@ public class NewsComponent implements Component{
 						}
 					}
 				});
+				rules = new NewsRule[files.length];
+				
 				/*FileInputStream fileOut = new FileInputStream(conf);
 				FileChannel fileChannel = fileOut.getChannel();
 				StringBuilder sb = new StringBuilder();
