@@ -1,6 +1,6 @@
 package com.jason.spider.rule;
 
-public class Rule {
+public class NewsRule extends Rule{
 	
 	private String encoding;
 	
