@@ -41,8 +41,8 @@ public class NewsComponent implements Component{
 	 * @return
 	 * @throws Exception
 	 */
-	private String readPath(String path) {
-		String code = "获取嵌入码配置文件出错，请确保site_code.21cn位于classes目录";
+	private void readPath(String path) {
+		
 		try {
 			File file = new File(path);
 			if(file.isDirectory()){
@@ -74,7 +74,6 @@ public class NewsComponent implements Component{
 			e.printStackTrace();
 		}
 
-		return code;
 	}
 	
 	public static void main(String arg[]){
