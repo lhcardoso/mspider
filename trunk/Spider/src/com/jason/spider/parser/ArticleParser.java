@@ -19,6 +19,7 @@ import org.htmlparser.tags.Span;
 import org.htmlparser.util.NodeList;
 
 import com.jason.spider.msg.Msg;
+import com.jason.spider.rule.NewsRule;
 import com.jason.spider.rule.Rule;
 import com.jason.spider.util.Queue;
 
@@ -27,14 +28,14 @@ public class ArticleParser implements Parser {
 	protected static final String lineSign = System.getProperty("line.separator");
 	protected static final int lineSign_size = lineSign.length();
 	
-	private Rule rule;
+	private NewsRule newsRule;
 	
 	/**
 	 * 规则.
 	 * 
 	 */
 	public void setRule(Rule rule){
-		this.rule = rule;
+		this.newsRule = (NewsRule)rule;
 	}
 
 	/**
@@ -60,7 +61,7 @@ public class ArticleParser implements Parser {
 			String siteUrl = getLinkUrl(url);
 			AndFilter andFilter = new AndFilter();
 			org.htmlparser.Parser parser = new org.htmlparser.Parser(siteUrl);
-			parser.setEncoding(rule.getEncoding());
+			parser.setEncoding(newsRule.getEncoding());
 			parser.reset();
 			andFilter.setPredicates(new NodeFilter[]{new NodeClassFilter(LinkTag.class)});
 			NodeList list = parser.extractAllNodesThatMatch(andFilter);
@@ -74,7 +75,7 @@ public class ArticleParser implements Parser {
 				}
 			}
 		}catch(Exception e){
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		
 	}
@@ -94,19 +95,19 @@ public class ArticleParser implements Parser {
 			Hashtable<String,Object> props = new Hashtable<String,Object>();
 			props.put("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows XP; DigExt)");
 			cm.setRequestProperties(props);
-			parser.setEncoding(rule.getEncoding());
+			parser.setEncoding(newsRule.getEncoding());
 			NodeFilter nodeFilter = null;
-			if(rule.getContentTag() != null){
+			if(newsRule.getContentTag() != null){
 				AndFilter andFilter = new AndFilter();
-				TagNameFilter titleFilter = new TagNameFilter(rule.getTitleTag());
+				TagNameFilter titleFilter = new TagNameFilter(newsRule.getTitleTag());
 				Vector<NodeFilter> titleNodeFilterVector = new Vector<NodeFilter>();
 				titleNodeFilterVector.add(titleFilter);
-				if(rule.getTitleTagId() != null){
-					HasAttributeFilter idAttribute = new HasAttributeFilter("id", rule.getTitleTagId());
+				if(newsRule.getTitleTagId() != null){
+					HasAttributeFilter idAttribute = new HasAttributeFilter("id", newsRule.getTitleTagId());
 					titleNodeFilterVector.add(idAttribute);
 				}
-				if(rule.getTitleTagClass() != null){
-					HasAttributeFilter classAttribute = new HasAttributeFilter("class", rule.getTitleTagClass());
+				if(newsRule.getTitleTagClass() != null){
+					HasAttributeFilter classAttribute = new HasAttributeFilter("class", newsRule.getTitleTagClass());
 					titleNodeFilterVector.add(classAttribute);
 				}
 				NodeFilter[] titleNodeFilter = new NodeFilter[titleNodeFilterVector.size()];
@@ -131,7 +132,7 @@ public class ArticleParser implements Parser {
 			}
 			text = builder.toString();
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return text;
 	}
@@ -152,19 +153,19 @@ public class ArticleParser implements Parser {
 			Hashtable<String,Object> props = new Hashtable<String,Object>();
 			props.put("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows XP; DigExt)");
 			cm.setRequestProperties(props);
-			parser.setEncoding(rule.getEncoding());
+			parser.setEncoding(newsRule.getEncoding());
 			NodeFilter nodeFilter = null;
-			if(rule.getContentTag() != null){
+			if(newsRule.getContentTag() != null){
 				AndFilter andFilter = new AndFilter();
-				TagNameFilter contentFilter = new TagNameFilter(rule.getContentTag());
+				TagNameFilter contentFilter = new TagNameFilter(newsRule.getContentTag());
 				Vector<NodeFilter> contentNodeFilterVector = new Vector<NodeFilter>();
 				contentNodeFilterVector.add(contentFilter);
-				if(rule.getContentTagId() != null){
-					HasAttributeFilter idAttribute = new HasAttributeFilter("id", rule.getContentTagId());
+				if(newsRule.getContentTagId() != null){
+					HasAttributeFilter idAttribute = new HasAttributeFilter("id", newsRule.getContentTagId());
 					contentNodeFilterVector.add(idAttribute);
 				}
-				if(rule.getContentTagClass() != null){
-					HasAttributeFilter classAttribute = new HasAttributeFilter("class", rule.getContentTagClass());
+				if(newsRule.getContentTagClass() != null){
+					HasAttributeFilter classAttribute = new HasAttributeFilter("class", newsRule.getContentTagClass());
 					contentNodeFilterVector.add(classAttribute);
 				}
 				NodeFilter[] contentNodeFilter = new NodeFilter[contentNodeFilterVector.size()];
@@ -186,7 +187,7 @@ public class ArticleParser implements Parser {
 			}
 			text = builder.toString();
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return text;
 	}

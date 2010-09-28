@@ -79,7 +79,6 @@ public class Spider {
 
 		public void run() {
 			while(isActivite){
-				System.out.println("abc");
 				String url = Queue.get();
 				parser.process(url);
 			}
