@@ -2,11 +2,9 @@ package com.jason.spider;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.jason.spider.parser.ArticleParser;
 import com.jason.spider.parser.Parser;
@@ -24,14 +22,22 @@ public class NewsComponent implements Component{
 	
 	private static final String news_rule_path = Constance.RULE_PATH +"/news";
 	
-	private NewsRule[] rules;
+	private List<NewsRule> rules;
+	
+	private List<File> ruleFiles;
+	
+	public NewsComponent(){
+		rules = new CopyOnWriteArrayList<NewsRule>();
+		ruleFiles = new CopyOnWriteArrayList<File>();
+	}
 	
 	/**
 	 * 构建相关规则.
 	 * 
 	 */
 	public void buildRules(){
-		
+		readPath(news_rule_path);
+		System.out.println(ruleFiles.size());
 	}
 	
 	/**
@@ -42,21 +48,18 @@ public class NewsComponent implements Component{
 	 * @throws Exception
 	 */
 	private void readPath(String path) {
-		
 		try {
 			File file = new File(path);
+			System.out.println(file.getAbsolutePath());
 			if(file.isDirectory()){
-				File[] files = file.listFiles(new FileFilter(){
-					public boolean accept(File subFile){
-						if(subFile.getName().lastIndexOf(".rule") != -1){
-							return true;
-						}else{
-							return false;
-						}
+				File[] files = file.listFiles();
+				for(File f:files){
+					if(f.isFile()){
+						ruleFiles.add(f);
+					}else{
+						readPath(f.getPath());
 					}
-				});
-				rules = new NewsRule[files.length];
-				
+				}
 				/*FileInputStream fileOut = new FileInputStream(conf);
 				FileChannel fileChannel = fileOut.getChannel();
 				StringBuilder sb = new StringBuilder();
@@ -77,7 +80,9 @@ public class NewsComponent implements Component{
 	}
 	
 	public static void main(String arg[]){
-		List<String> urls = new LinkedList<String>();
+		NewsComponent newsComponent = new NewsComponent();
+		newsComponent.buildRules();
+		/*List<String> urls = new LinkedList<String>();
 		List<Rule> rules = new LinkedList<Rule>();
 		List<Parser> parsers = new LinkedList<Parser>();
 		
@@ -90,7 +95,7 @@ public class NewsComponent implements Component{
 		_163Rule.setContentTag("div");
 		_163Rule.setContentTagId("endText");
 		urls.add(_163url);
-		rules.add(_163Rule);
+		rules.add(_163Rule);*/
 		
 		//新浪.
 		/*String sinaurl = "http://gd.news.sina.com.cn/news/2010/09/04/989563.html";
@@ -113,13 +118,13 @@ public class NewsComponent implements Component{
 		urls.add(csdnBlogUrl);
 		rules.add(csdnBlogRule);*/
 		
-		for(Rule rule:rules){
+		/*for(Rule rule:rules){
 			Parser parser = new ArticleParser();
 			parser.setRule(rule);
 			parsers.add(parser);
 		}
 		Spider spider = new Spider(urls,parsers);
-		spider.start();
+		spider.start();*/
 	}
 
 }
