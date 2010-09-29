@@ -15,6 +15,12 @@ public class NewsRule extends Rule{
 	private String titleTagId;
 	
 	private String titleTagClass;
+	
+	private String parentTag;
+	
+	private String parentTagId;
+	
+	private String parentTagClass;
 
 	public String getContentTag() {
 		return contentTag;
@@ -70,6 +76,30 @@ public class NewsRule extends Rule{
 
 	public void setTitleTagClass(String titleTagClass) {
 		this.titleTagClass = titleTagClass;
+	}
+
+	public String getParentTag() {
+		return parentTag;
+	}
+
+	public void setParentTag(String parentTag) {
+		this.parentTag = parentTag;
+	}
+
+	public String getParentTagId() {
+		return parentTagId;
+	}
+
+	public void setParentTagId(String parentTagId) {
+		this.parentTagId = parentTagId;
+	}
+
+	public String getParentTagClass() {
+		return parentTagClass;
+	}
+
+	public void setParentTagClass(String parentTagClass) {
+		this.parentTagClass = parentTagClass;
 	}
 	
 	
