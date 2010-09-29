@@ -6,16 +6,16 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Queue {
 
-	private static LinkedList<String> queue = new LinkedList<String>();
+	private LinkedList<String> queue = new LinkedList<String>();
 
 	//private static ReentrantLock lock = new ReentrantLock();
 	
-	private static Object lock = new Object();
+	private Object lock = new Object();
 	
 	//private static Condition notEmpty = lock.newCondition();
 	
 
-	public static  void add(String t) {
+	public  void add(String t) {
 		synchronized(lock){
 			try{
 				if (queue.contains(t)) {
@@ -29,7 +29,7 @@ public class Queue {
 		
 	}
 
-	public  static String get() {
+	public   String get() {
 		synchronized(lock){
 			try{
 				if(queue.size()==0){
@@ -46,7 +46,7 @@ public class Queue {
 		
 	}
 
-	public static boolean isEmpty() {
+	public  boolean isEmpty() {
 		return queue.isEmpty();
 	}
 
