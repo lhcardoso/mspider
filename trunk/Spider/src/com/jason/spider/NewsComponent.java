@@ -2,15 +2,19 @@ package com.jason.spider;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 
 import com.jason.spider.parser.ArticleParser;
 import com.jason.spider.parser.Parser;
 import com.jason.spider.rule.NewsRule;
 import com.jason.spider.rule.Rule;
 import com.jason.spider.util.Constance;
+import com.jason.spider.util.RuleKeyEnum;
 
 /***
  * 新闻相关组件
@@ -18,7 +22,9 @@ import com.jason.spider.util.Constance;
  * @author lishsh.
  *
  */
-public class NewsComponent implements Component{
+public class NewsComponent extends Component{
+	
+	private static final int BYTE_BUFFER = 1024;
 	
 	private static final String news_rule_path = Constance.RULE_PATH +"/news";
 	
@@ -26,22 +32,32 @@ public class NewsComponent implements Component{
 	
 	private List<File> ruleFiles;
 	
+	private List<Parser> parsers;
+	
 	public NewsComponent(){
 		rules = new CopyOnWriteArrayList<NewsRule>();
 		ruleFiles = new CopyOnWriteArrayList<File>();
+		parsers = new CopyOnWriteArrayList<Parser>();
 	}
 	
 	/**
 	 * 构建相关规则.
 	 * 
 	 */
-	public void buildRules(){
+	public List<Parser> buildRules(){
 		readPath(news_rule_path);
-		System.out.println(ruleFiles.size());
+		parseFiles();
+		for(Rule rule:rules){
+			Parser parser = new ArticleParser();
+			parser.setRule(rule);
+			parsers.add(parser);
+		}
+		return parsers;
 	}
 	
 	/**
-	 * 用FileChannel读取嵌套码文件内容.
+	 * 读取路径规则文件.
+	 * 
 	 * 
 	 * @param siteCode
 	 * @return
@@ -50,9 +66,16 @@ public class NewsComponent implements Component{
 	private void readPath(String path) {
 		try {
 			File file = new File(path);
-			System.out.println(file.getAbsolutePath());
 			if(file.isDirectory()){
-				File[] files = file.listFiles();
+				File[] files = file.listFiles(new FileFilter(){
+					public boolean accept(File sub){
+						if(sub.isDirectory() || ((sub.isFile() && sub.getName().endsWith(".xml")))){
+							return true;
+						}else{
+							return false;
+						}
+					}
+				});
 				for(File f:files){
 					if(f.isFile()){
 						ruleFiles.add(f);
@@ -60,18 +83,8 @@ public class NewsComponent implements Component{
 						readPath(f.getPath());
 					}
 				}
-				/*FileInputStream fileOut = new FileInputStream(conf);
-				FileChannel fileChannel = fileOut.getChannel();
-				StringBuilder sb = new StringBuilder();
-				ByteBuffer byteBuffer = ByteBuffer.allocate(BYTE_BUFFER);
-				while (fileChannel.read(byteBuffer) != -1) {
-					byteBuffer.flip();
-					while (byteBuffer.hasRemaining()) {
-						sb.append((char) byteBuffer.get());
-					}
-					byteBuffer.clear();
-				}
-				code = sb.toString();*/
+			}else{
+				ruleFiles.add(file);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -79,52 +92,44 @@ public class NewsComponent implements Component{
 
 	}
 	
-	public static void main(String arg[]){
-		NewsComponent newsComponent = new NewsComponent();
-		newsComponent.buildRules();
-		/*List<String> urls = new LinkedList<String>();
-		List<Rule> rules = new LinkedList<Rule>();
-		List<Parser> parsers = new LinkedList<Parser>();
-		
-		//163
-		String _163url = "http://news.163.com/10/0905/01/6FPHM79P000146BD.html";
-		NewsRule _163Rule = new NewsRule();
-		_163Rule.setTitleTag("h1");
-		_163Rule.setTitleTagId("h1title");
-		_163Rule.setEncoding("gb2312");
-		_163Rule.setContentTag("div");
-		_163Rule.setContentTagId("endText");
-		urls.add(_163url);
-		rules.add(_163Rule);*/
-		
-		//新浪.
-		/*String sinaurl = "http://gd.news.sina.com.cn/news/2010/09/04/989563.html";
-	
-		Rule sinaRule = new SinaRule();
-		sinaRule.setEncoding("gb2312");
-		sinaRule.setContentTag("div");
-		sinaRule.setContentTagId("artibody1");
-		sinaRule.setTitleTag("h1");
-		sinaRule.setTitleTagId("artibodyTitle");
-		urls.add(sinaurl);
-		rules.add(sinaRule);*/
-		
-		//csdn博客
-		/*String csdnBlogUrl = "http://blog.csdn.net/cping1982/archive/2010/08/14/5811779.aspx";
-		Rule csdnBlogRule = new CsdnBlogRule();
-		csdnBlogRule.setEncoding("utf-8");
-		csdnBlogRule.setContentTag("div");
-		csdnBlogRule.setContentTagClass("blogstory");
-		urls.add(csdnBlogUrl);
-		rules.add(csdnBlogRule);*/
-		
-		/*for(Rule rule:rules){
-			Parser parser = new ArticleParser();
-			parser.setRule(rule);
-			parsers.add(parser);
+	/**
+	 * 转换规则文件-对象.
+	 * 
+	 */
+	private void parseFiles(){
+		for(File file:ruleFiles){
+			try{
+				NewsRule rule = new NewsRule();
+				SAXReader saxReader = new SAXReader();
+	            Document document = saxReader.read(file);
+	            Element rootNode = document.getRootElement();
+	            String encoding = rootNode.element(RuleKeyEnum.ENCODING.getName()).getText();
+	            rule.setEncoding(encoding);
+	            Element title = rootNode.element(RuleKeyEnum.TITLE.getName());
+	            Element titleTag = title.element(RuleKeyEnum.TAG.getName());
+	            Element titleId = title.element(RuleKeyEnum.ID.getName());
+	            Element titleClass = title.element(RuleKeyEnum.CLASS.getName());
+	            rule.setTitleTag(titleTag.getText());
+	            rule.setTitleTagId(titleId.getText());
+	            if(titleClass != null){
+	            	rule.setTitleTagClass(titleClass.getText());
+	            }
+	            Element content = rootNode.element(RuleKeyEnum.CONTENT.getName());
+	            Element contentTag = content.element(RuleKeyEnum.TAG.getName());
+	            Element contentId = content.element(RuleKeyEnum.ID.getName());
+	            Element contentClass = content.element(RuleKeyEnum.CLASS.getName());
+	            rule.setContentTag(contentTag.getText());
+	            rule.setContentTagId(contentId.getText());
+	            if(contentClass != null){
+	            	rule.setContentTagClass(contentClass.getText());
+	            }
+	            rules.add(rule);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
 		}
-		Spider spider = new Spider(urls,parsers);
-		spider.start();*/
 	}
+
+	
 
 }

@@ -42,12 +42,12 @@ public class ArticleParser implements Parser {
 	 * 分析抓取.
 	 * 
 	 */
-	public Msg process(String url) {
+	public Msg process(String url,Queue queue) {
 		//System.out.println(url);
 		String title = processTitle(url);
 		String content = processContent(url);
 		System.out.println(title);
-		processLink(url);
+		processLink(url,queue);
 		return null;
 	}
 	
@@ -56,7 +56,7 @@ public class ArticleParser implements Parser {
 	 * 
 	 * @param url
 	 */
-	public void processLink(String url){
+	public void processLink(String url,Queue queue){
 		try{
 			String siteUrl = getLinkUrl(url);
 			AndFilter andFilter = new AndFilter();
@@ -70,8 +70,7 @@ public class ArticleParser implements Parser {
 				if(node instanceof LinkTag){
 					LinkTag linkTag = (LinkTag)node;
 					String linkUrl = linkTag.getLink();
-					Queue.add(linkUrl);
-					
+					queue.add(linkUrl);
 				}
 			}
 		}catch(Exception e){
@@ -97,7 +96,7 @@ public class ArticleParser implements Parser {
 			cm.setRequestProperties(props);
 			parser.setEncoding(newsRule.getEncoding());
 			NodeFilter nodeFilter = null;
-			if(newsRule.getContentTag() != null){
+			if(newsRule.getTitleTag() != null){
 				AndFilter andFilter = new AndFilter();
 				TagNameFilter titleFilter = new TagNameFilter(newsRule.getTitleTag());
 				Vector<NodeFilter> titleNodeFilterVector = new Vector<NodeFilter>();
