@@ -5,6 +5,7 @@ public enum RuleKeyEnum {
 	ENCODING("encoding"),
 	TITLE("title"),
 	CONTENT("content"),
+	PARENT("parent"),
 	TAG("tag"),
 	ID("id"),
 	CLASS("class");
