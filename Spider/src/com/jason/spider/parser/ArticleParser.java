@@ -86,14 +86,11 @@ public class ArticleParser implements Parser {
 	 * @return
 	 */
 	public String processTitle(String url){
+		
 		String text = "";
 		try {
 			org.htmlparser.Parser parser = new org.htmlparser.Parser(url);
 			parser.reset();
-			ConnectionManager cm = parser.getConnectionManager();
-			Hashtable<String,Object> props = new Hashtable<String,Object>();
-			props.put("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows XP; DigExt)");
-			cm.setRequestProperties(props);
 			parser.setEncoding(newsRule.getEncoding());
 			NodeFilter nodeFilter = null;
 			if(newsRule.getTitleTag() != null){
@@ -109,6 +106,18 @@ public class ArticleParser implements Parser {
 					HasAttributeFilter classAttribute = new HasAttributeFilter("class", newsRule.getTitleTagClass());
 					titleNodeFilterVector.add(classAttribute);
 				}
+				if(newsRule.getParentTag() != null){
+					TagNameFilter parentFilter = new TagNameFilter(newsRule.getParentTag());
+					titleNodeFilterVector.add(parentFilter);
+					if(newsRule.getParentTagId() != null){
+						HasAttributeFilter parentIdAttribute = new HasAttributeFilter("id", newsRule.getParentTagId());
+						titleNodeFilterVector.add(parentIdAttribute);
+					}
+					if(newsRule.getParentTagClass() != null){
+						HasAttributeFilter parentClassAttribute = new HasAttributeFilter("class", newsRule.getParentTagClass());
+						titleNodeFilterVector.add(parentClassAttribute);
+					}
+				}
 				NodeFilter[] titleNodeFilter = new NodeFilter[titleNodeFilterVector.size()];
 				andFilter.setPredicates(titleNodeFilterVector.toArray(titleNodeFilter));
 				nodeFilter = andFilter;
@@ -116,22 +125,103 @@ public class ArticleParser implements Parser {
 			
 			StringBuilder builder = new StringBuilder();
 			NodeList list = parser.extractAllNodesThatMatch(nodeFilter);
-			for (int i = 0; i < list.size(); i++) {
-				Node node = list.elementAt(i);
-				if (node instanceof Div) {
-					Div nodeTag = (Div) node;
-					builder.append(nodeTag.getStringText());
-				} else if (node instanceof Span) {
-					Span nodeTag = (Span) node;
-					builder.append(nodeTag.getStringText());
-				}else if (node instanceof HeadingTag) {
-					HeadingTag nodeTag = (HeadingTag) node;
-					builder.append(nodeTag.getStringText());
+			if(list.size() >1){
+				System.out.println("size >1:"+url);
+				for (int i = 0; i < list.size(); i++){
+					Node node = list.elementAt(i);
+					System.out.println(node.toString());
+					Node parent = node.getParent();
+					System.out.println(parent.toString());
+					if (parent instanceof Div){
+						System.out.println("parent div");
+						Div parentTag = (Div) parent;
+						String id = parentTag.getAttribute("id");
+						String clas = parentTag.getAttribute("class");
+						if(parentTag.getRawTagName().equals(newsRule.getParentTag())
+								&&((id != null && id.equals(newsRule.getParentTagId()))
+								||(clas!=null && clas.equals(newsRule.getParentTagClass()))
+								)){
+							System.out.println(parentTag.getRawTagName()+id+clas);
+							
+							if (node instanceof Div) {
+								Div nodeTag = (Div) node;
+								builder.append(nodeTag.getStringText());
+							} else if (node instanceof Span) {
+								Span nodeTag = (Span) node;
+								builder.append(nodeTag.getStringText());
+							}else if (node instanceof HeadingTag) {
+								HeadingTag nodeTag = (HeadingTag) node;
+								builder.append(nodeTag.getStringText());
+							}
+							break;
+						}
+					}else if (parent instanceof Span) {
+						System.out.println("parent span");
+						Span parentTag = (Span) parent;
+						String id = parentTag.getAttribute("id");
+						String clas = parentTag.getAttribute("class");
+						if(parentTag.getRawTagName().equals(newsRule.getParentTag())
+								&&((id != null && id.equals(newsRule.getParentTagId()))
+								||(clas!=null && clas.equals(newsRule.getParentTagClass()))
+								)){
+							if (node instanceof Div) {
+								Div nodeTag = (Div) node;
+								builder.append(nodeTag.getStringText());
+							} else if (node instanceof Span) {
+								Span nodeTag = (Span) node;
+								builder.append(nodeTag.getStringText());
+							}else if (node instanceof HeadingTag) {
+								HeadingTag nodeTag = (HeadingTag) node;
+								builder.append(nodeTag.getStringText());
+							}
+							break;
+						}
+					}else if (parent instanceof HeadingTag) {
+						System.out.println("parent heading");
+						HeadingTag parentTag = (HeadingTag) parent;
+						String id = parentTag.getAttribute("id");
+						String clas = parentTag.getAttribute("class");
+						if(parentTag.getRawTagName().equals(newsRule.getParentTag())
+								&&((id != null && id.equals(newsRule.getParentTagId()))
+								||(clas!=null && clas.equals(newsRule.getParentTagClass()))
+								)){
+							if (node instanceof Div) {
+								Div nodeTag = (Div) node;
+								builder.append(nodeTag.getStringText());
+							} else if (node instanceof Span) {
+								Span nodeTag = (Span) node;
+								builder.append(nodeTag.getStringText());
+							}else if (node instanceof HeadingTag) {
+								HeadingTag nodeTag = (HeadingTag) node;
+								builder.append(nodeTag.getStringText());
+							}
+							break;
+						}
+					}
+				}
+			}else{
+				System.out.println("size=1"+url);
+				for(int i = 0; i < list.size(); i++){
+					Node node = list.elementAt(i);
+					System.out.println("node:"+node.toString());
+					Node parent = node.getParent();
+					System.out.println("parent"+parent.toString());
+					if (node instanceof Div) {
+						Div nodeTag = (Div) node;
+						builder.append(nodeTag.getStringText());
+					} else if (node instanceof Span) {
+						Span nodeTag = (Span) node;
+						builder.append(nodeTag.getStringText());
+					}else if (node instanceof HeadingTag) {
+						HeadingTag nodeTag = (HeadingTag) node;
+						builder.append(nodeTag.getStringText());
+					}
 				}
 			}
+			
 			text = builder.toString();
 		} catch (Exception e) {
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 		return text;
 	}
