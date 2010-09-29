@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rule>
+	<encoding>gb2312</encoding>
+	<title>
+		<tag>h1</tag>
+		<id>artibodyTitle</id>
+	</title>
+	<content>
+		<tag>div</tag>
+		<id>artibody1</id>
+	</content>
+</rule>
