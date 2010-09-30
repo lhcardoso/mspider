@@ -2,6 +2,8 @@ package com.jason.spider.util;
 
 public enum RuleKeyEnum {
 	RULE("rule"),
+	DOWNLOAD("download"),
+	ISDOWNLOAD("isdownload"),
 	ENCODING("encoding"),
 	TITLE("title"),
 	CONTENT("content"),

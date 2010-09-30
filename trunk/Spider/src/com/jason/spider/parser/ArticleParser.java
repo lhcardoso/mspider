@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import org.htmlparser.Node;
 import org.htmlparser.NodeFilter;
-import org.htmlparser.Remark;
 import org.htmlparser.Tag;
 import org.htmlparser.Text;
 import org.htmlparser.filters.AndFilter;
@@ -16,12 +15,12 @@ import org.htmlparser.filters.NodeClassFilter;
 import org.htmlparser.filters.TagNameFilter;
 import org.htmlparser.http.ConnectionManager;
 import org.htmlparser.tags.Div;
-import org.htmlparser.tags.HeadingTag;
 import org.htmlparser.tags.LinkTag;
 import org.htmlparser.tags.Span;
 import org.htmlparser.util.NodeList;
 import org.htmlparser.visitors.NodeVisitor;
 
+import com.jason.spider.PageDownloader;
 import com.jason.spider.msg.Msg;
 import com.jason.spider.rule.NewsRule;
 import com.jason.spider.rule.Rule;
@@ -33,6 +32,16 @@ public class ArticleParser implements Parser {
 	protected static final int lineSign_size = lineSign.length();
 	
 	private  NewsRule newsRule ;
+	
+	private PageDownloader downloader;
+	
+	public ArticleParser(){
+		
+	}
+	
+	public ArticleParser(PageDownloader downloader){
+		this.downloader = downloader;
+	}
 	
 	/**
 	 * 规则.
@@ -47,11 +56,13 @@ public class ArticleParser implements Parser {
 	 * 
 	 */
 	public Msg process(String url,Queue queue) {
-		//System.out.println(url);
 		String title = processTitle(url);
-		//String content = processContent(url);
-		//System.out.println(title);
+		String content = processContent(url);
+		System.out.println(title);
 		processLink(url,queue);
+		if(newsRule.isDownPage()){
+			downloader.addUrl(url);
+		}
 		return null;
 	}
 	
@@ -102,42 +113,7 @@ public class ArticleParser implements Parser {
 			parser.setEncoding(newsRule.getEncoding());
 			NewsTitleNodeVisitor titleVisitor = new NewsTitleNodeVisitor();
 			parser.visitAllNodesWith(titleVisitor);
-			System.out.println(titleVisitor.getContent());
-			/*NodeFilter nodeFilter = null;
-			if(newsRule.getTitleTag() != null){
-				AndFilter andFilter = new AndFilter();
-				TagNameFilter titleFilter = new TagNameFilter(newsRule.getTitleTag());
-				Vector<NodeFilter> titleNodeFilterVector = new Vector<NodeFilter>();
-				titleNodeFilterVector.add(titleFilter);
-				if(newsRule.getTitleTagId() != null){
-					HasAttributeFilter idAttribute = new HasAttributeFilter("id", newsRule.getTitleTagId());
-					titleNodeFilterVector.add(idAttribute);
-				}
-				if(newsRule.getTitleTagClass() != null){
-					HasAttributeFilter classAttribute = new HasAttributeFilter("class", newsRule.getTitleTagClass());
-					titleNodeFilterVector.add(classAttribute);
-				}
-				NodeFilter[] titleNodeFilter = new NodeFilter[titleNodeFilterVector.size()];
-				andFilter.setPredicates(titleNodeFilterVector.toArray(titleNodeFilter));
-				nodeFilter = andFilter;
-			}
-			StringBuilder builder = new StringBuilder();
-			NodeList list = parser.extractAllNodesThatMatch(nodeFilter);
-			for(int i = 0; i < list.size(); i++){
-				Node node = list.elementAt(i);
-				System.out.println("node:"+node.getText());
-				if (node instanceof Div) {
-					Div nodeTag = (Div) node;
-					builder.append(nodeTag.getStringText());
-				} else if (node instanceof Span) {
-					Span nodeTag = (Span) node;
-					builder.append(nodeTag.getStringText());
-				}else if (node instanceof HeadingTag) {
-					HeadingTag nodeTag = (HeadingTag) node;
-					builder.append(nodeTag.getStringText());
-				}
-			}
-			text = builder.toString();*/
+			text = titleVisitor.getContent();
 		} catch (Exception e) {
 			//e.printStackTrace();
 		}
@@ -315,12 +291,10 @@ public class ArticleParser implements Parser {
 			}
 		}
 
-		
 		public void visitStringNode(Text string) {
 			//System.out.println("Text:" + string);
 		}
 
-		
 		public String getContent(){
 			return builder.toString();
 		}

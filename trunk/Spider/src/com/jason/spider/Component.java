@@ -9,17 +9,25 @@ public abstract class Component {
 	
 	private static final int POOL_SIZE = 5;
 	
+	
 	private Spider spider;
 	
 	private Queue queue;
 	
+	private PageDownloader downloader;
+	
 	public Component(){
 		this.queue = new Queue();
+		this.downloader = new PageDownloader(POOL_SIZE);
 		spider = new Spider(POOL_SIZE,queue);
 	}
 	
 	public Spider getSpider(){
 		return this.spider;
+	}
+	
+	public PageDownloader getDownloader(){
+		return this.downloader;
 	}
 	
 	public void addUrl(String url){

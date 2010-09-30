@@ -48,7 +48,7 @@ public class NewsComponent extends Component{
 		readPath(news_rule_path);
 		parseFiles();
 		for(Rule rule:rules){
-			Parser parser = new ArticleParser();
+			Parser parser = new ArticleParser(this.getDownloader());
 			parser.setRule(rule);
 			parsers.add(parser);
 		}
@@ -139,6 +139,16 @@ public class NewsComponent extends Component{
 	 	            if(parentClass != null){
 	 	            	rule.setParentTagClass(parentClass.getText());
 	 	            }
+	            }
+	            
+	            Element download = rootNode.element(RuleKeyEnum.DOWNLOAD.getName());
+	            if(download != null){
+	            	Element isdownload = download.element(RuleKeyEnum.ISDOWNLOAD.getName());
+	            	if(isdownload != null && isdownload.getText().equalsIgnoreCase("yes")){
+	            		rule.setDownPage(true);
+	            	}else{
+	            		rule.setDownPage(false);
+	            	}
 	            }
 	           
 	            rules.add(rule);
