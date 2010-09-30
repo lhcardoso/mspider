@@ -9,4 +9,7 @@
 		<tag>div</tag>
 		<id>artibody1</id>
 	</content>
+	<download>
+		<isdownload>yes</isdownload>
+	</download>
 </rule>
