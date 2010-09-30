@@ -7,6 +7,9 @@ import java.util.regex.Pattern;
 
 import org.htmlparser.Node;
 import org.htmlparser.NodeFilter;
+import org.htmlparser.Remark;
+import org.htmlparser.Tag;
+import org.htmlparser.Text;
 import org.htmlparser.filters.AndFilter;
 import org.htmlparser.filters.HasAttributeFilter;
 import org.htmlparser.filters.NodeClassFilter;
@@ -17,6 +20,7 @@ import org.htmlparser.tags.HeadingTag;
 import org.htmlparser.tags.LinkTag;
 import org.htmlparser.tags.Span;
 import org.htmlparser.util.NodeList;
+import org.htmlparser.visitors.NodeVisitor;
 
 import com.jason.spider.msg.Msg;
 import com.jason.spider.rule.NewsRule;
@@ -28,7 +32,7 @@ public class ArticleParser implements Parser {
 	protected static final String lineSign = System.getProperty("line.separator");
 	protected static final int lineSign_size = lineSign.length();
 	
-	private NewsRule newsRule;
+	private  NewsRule newsRule ;
 	
 	/**
 	 * 规则.
@@ -45,8 +49,8 @@ public class ArticleParser implements Parser {
 	public Msg process(String url,Queue queue) {
 		//System.out.println(url);
 		String title = processTitle(url);
-		String content = processContent(url);
-		System.out.println(title);
+		//String content = processContent(url);
+		//System.out.println(title);
 		processLink(url,queue);
 		return null;
 	}
@@ -91,8 +95,15 @@ public class ArticleParser implements Parser {
 		try {
 			org.htmlparser.Parser parser = new org.htmlparser.Parser(url);
 			parser.reset();
+			ConnectionManager cm = parser.getConnectionManager();
+			Hashtable<String,Object> props = new Hashtable<String,Object>();
+			props.put("User-Agent", "Mozilla/4.0 (compatible; MSIE 5.0; Windows XP; DigExt)");
+			cm.setRequestProperties(props);
 			parser.setEncoding(newsRule.getEncoding());
-			NodeFilter nodeFilter = null;
+			NewsTitleNodeVisitor titleVisitor = new NewsTitleNodeVisitor();
+			parser.visitAllNodesWith(titleVisitor);
+			System.out.println(titleVisitor.getContent());
+			/*NodeFilter nodeFilter = null;
 			if(newsRule.getTitleTag() != null){
 				AndFilter andFilter = new AndFilter();
 				TagNameFilter titleFilter = new TagNameFilter(newsRule.getTitleTag());
@@ -106,122 +117,29 @@ public class ArticleParser implements Parser {
 					HasAttributeFilter classAttribute = new HasAttributeFilter("class", newsRule.getTitleTagClass());
 					titleNodeFilterVector.add(classAttribute);
 				}
-				if(newsRule.getParentTag() != null){
-					TagNameFilter parentFilter = new TagNameFilter(newsRule.getParentTag());
-					titleNodeFilterVector.add(parentFilter);
-					if(newsRule.getParentTagId() != null){
-						HasAttributeFilter parentIdAttribute = new HasAttributeFilter("id", newsRule.getParentTagId());
-						titleNodeFilterVector.add(parentIdAttribute);
-					}
-					if(newsRule.getParentTagClass() != null){
-						HasAttributeFilter parentClassAttribute = new HasAttributeFilter("class", newsRule.getParentTagClass());
-						titleNodeFilterVector.add(parentClassAttribute);
-					}
-				}
 				NodeFilter[] titleNodeFilter = new NodeFilter[titleNodeFilterVector.size()];
 				andFilter.setPredicates(titleNodeFilterVector.toArray(titleNodeFilter));
 				nodeFilter = andFilter;
 			}
-			
 			StringBuilder builder = new StringBuilder();
 			NodeList list = parser.extractAllNodesThatMatch(nodeFilter);
-			if(list.size() >1){
-				System.out.println("size >1:"+url);
-				for (int i = 0; i < list.size(); i++){
-					Node node = list.elementAt(i);
-					System.out.println(node.toString());
-					Node parent = node.getParent();
-					System.out.println(parent.toString());
-					if (parent instanceof Div){
-						System.out.println("parent div");
-						Div parentTag = (Div) parent;
-						String id = parentTag.getAttribute("id");
-						String clas = parentTag.getAttribute("class");
-						if(parentTag.getRawTagName().equals(newsRule.getParentTag())
-								&&((id != null && id.equals(newsRule.getParentTagId()))
-								||(clas!=null && clas.equals(newsRule.getParentTagClass()))
-								)){
-							System.out.println(parentTag.getRawTagName()+id+clas);
-							
-							if (node instanceof Div) {
-								Div nodeTag = (Div) node;
-								builder.append(nodeTag.getStringText());
-							} else if (node instanceof Span) {
-								Span nodeTag = (Span) node;
-								builder.append(nodeTag.getStringText());
-							}else if (node instanceof HeadingTag) {
-								HeadingTag nodeTag = (HeadingTag) node;
-								builder.append(nodeTag.getStringText());
-							}
-							break;
-						}
-					}else if (parent instanceof Span) {
-						System.out.println("parent span");
-						Span parentTag = (Span) parent;
-						String id = parentTag.getAttribute("id");
-						String clas = parentTag.getAttribute("class");
-						if(parentTag.getRawTagName().equals(newsRule.getParentTag())
-								&&((id != null && id.equals(newsRule.getParentTagId()))
-								||(clas!=null && clas.equals(newsRule.getParentTagClass()))
-								)){
-							if (node instanceof Div) {
-								Div nodeTag = (Div) node;
-								builder.append(nodeTag.getStringText());
-							} else if (node instanceof Span) {
-								Span nodeTag = (Span) node;
-								builder.append(nodeTag.getStringText());
-							}else if (node instanceof HeadingTag) {
-								HeadingTag nodeTag = (HeadingTag) node;
-								builder.append(nodeTag.getStringText());
-							}
-							break;
-						}
-					}else if (parent instanceof HeadingTag) {
-						System.out.println("parent heading");
-						HeadingTag parentTag = (HeadingTag) parent;
-						String id = parentTag.getAttribute("id");
-						String clas = parentTag.getAttribute("class");
-						if(parentTag.getRawTagName().equals(newsRule.getParentTag())
-								&&((id != null && id.equals(newsRule.getParentTagId()))
-								||(clas!=null && clas.equals(newsRule.getParentTagClass()))
-								)){
-							if (node instanceof Div) {
-								Div nodeTag = (Div) node;
-								builder.append(nodeTag.getStringText());
-							} else if (node instanceof Span) {
-								Span nodeTag = (Span) node;
-								builder.append(nodeTag.getStringText());
-							}else if (node instanceof HeadingTag) {
-								HeadingTag nodeTag = (HeadingTag) node;
-								builder.append(nodeTag.getStringText());
-							}
-							break;
-						}
-					}
-				}
-			}else{
-				System.out.println("size=1"+url);
-				for(int i = 0; i < list.size(); i++){
-					Node node = list.elementAt(i);
-					System.out.println("node:"+node.toString());
-					Node parent = node.getParent();
-					System.out.println("parent"+parent.toString());
-					if (node instanceof Div) {
-						Div nodeTag = (Div) node;
-						builder.append(nodeTag.getStringText());
-					} else if (node instanceof Span) {
-						Span nodeTag = (Span) node;
-						builder.append(nodeTag.getStringText());
-					}else if (node instanceof HeadingTag) {
-						HeadingTag nodeTag = (HeadingTag) node;
-						builder.append(nodeTag.getStringText());
-					}
+			for(int i = 0; i < list.size(); i++){
+				Node node = list.elementAt(i);
+				System.out.println("node:"+node.getText());
+				if (node instanceof Div) {
+					Div nodeTag = (Div) node;
+					builder.append(nodeTag.getStringText());
+				} else if (node instanceof Span) {
+					Span nodeTag = (Span) node;
+					builder.append(nodeTag.getStringText());
+				}else if (node instanceof HeadingTag) {
+					HeadingTag nodeTag = (HeadingTag) node;
+					builder.append(nodeTag.getStringText());
 				}
 			}
-			
-			text = builder.toString();
+			text = builder.toString();*/
 		} catch (Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		return text;
 	}
@@ -304,5 +222,110 @@ public class ArticleParser implements Parser {
 
 		return url;
 	}
+	
+	/**
+	 * 实现自定义访问类.
+	 * 
+	 * @author lishsh.
+	 *
+	 */
+	class NewsTitleNodeVisitor extends NodeVisitor {
+		
+		private static final String ID = "id";
+		
+		private static final String CLASS = "class";
+		
+		StringBuilder builder = new StringBuilder();
+		
+		NewsRule rule = ArticleParser.this.newsRule;
+		
+		public NewsTitleNodeVisitor() {
+			super(true, true);
+		}
+
+		public void visitTag(Tag tag) {
+			//System.out.println(tag.toString());
+			//存在父节点.先解析父节点.
+			if(rule.getParentTag() != null){
+				if(tag.getTagName().equalsIgnoreCase(rule.getParentTag())){
+					String id = tag.getAttribute(ID);
+					String _class = tag.getAttribute(CLASS);
+					if(id != null && id.equalsIgnoreCase(rule.getParentTagId())){
+						NodeList childs = tag.getChildren();
+						for(int i=0;i<childs.size();i++){
+							Node node = childs.elementAt(i);
+							if(node instanceof Tag){
+								Tag nodetag = (Tag)node;
+								String ruleId = rule.getTitleTagId();
+								String ruleClass = rule.getTitleTagClass();
+								if(nodetag.getTagName().equalsIgnoreCase(rule.getTitleTag()) 
+										&& ruleId != null && nodetag.getAttribute(ID) != null 
+										&& ruleId.equalsIgnoreCase(nodetag.getAttribute(ID))){
+									builder.append(node.toPlainTextString());
+									break;
+								}else if(nodetag.getTagName().equalsIgnoreCase(rule.getTitleTag()) 
+										&& ruleClass != null && nodetag.getAttribute(CLASS) != null
+										&& ruleClass.equalsIgnoreCase(nodetag.getAttribute(CLASS))){
+									builder.append(node.toPlainTextString());
+									break;
+								}else if(nodetag.getTagName().equalsIgnoreCase(rule.getTitleTag())){
+									builder.append(node.toPlainTextString());
+									break;
+								}
+							}
+						}
+					}else if(_class != null && _class.equalsIgnoreCase(rule.getParentTagClass())){
+						NodeList childs = tag.getChildren();
+						
+						for(int i=0;i<childs.size();i++){
+							Node node = childs.elementAt(i);
+							if(node instanceof Tag){
+								Tag nodetag = (Tag)node;
+								String ruleId = rule.getTitleTagId();
+								String ruleClass = rule.getTitleTagClass();
+								if(nodetag.getTagName().equalsIgnoreCase(rule.getTitleTag()) 
+										&& ruleId != null && nodetag.getAttribute(ID) != null 
+										&& ruleId.equalsIgnoreCase(nodetag.getAttribute(ID))){
+									builder.append(node.toPlainTextString());
+									break;
+								}else if(nodetag.getTagName().equalsIgnoreCase(rule.getTitleTag()) 
+										&& ruleClass != null && nodetag.getAttribute(CLASS) != null
+										&& ruleClass.equalsIgnoreCase(nodetag.getAttribute(CLASS))){
+									builder.append(node.toPlainTextString());
+									break;
+								}else if(nodetag.getTagName().equalsIgnoreCase(rule.getTitleTag())){
+									builder.append(node.toPlainTextString());
+									break;
+								}
+							}
+							
+						}
+					}
+				}
+			}else{
+				if(tag.getTagName().equalsIgnoreCase(rule.getTitleTag())){
+					String id = tag.getAttribute(ID);
+					String _class = tag.getAttribute(CLASS);
+					if(id != null && id.equalsIgnoreCase(rule.getTitleTagId())){
+						builder.append(tag.toPlainTextString());
+					}else if(_class != null && _class.equalsIgnoreCase(rule.getTitleTagClass())){
+						builder.append(tag.toPlainTextString());
+					}
+				}
+			}
+		}
+
+		
+		public void visitStringNode(Text string) {
+			//System.out.println("Text:" + string);
+		}
+
+		
+		public String getContent(){
+			return builder.toString();
+		}
+	}
+	
+	
 
 }

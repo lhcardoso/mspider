@@ -128,16 +128,19 @@ public class NewsComponent extends Component{
 	            	rule.setContentTagClass(contentClass.getText());
 	            }
 	            Element parent = rootNode.element(RuleKeyEnum.PARENT.getName());
-	            Element parentTag = parent.element(RuleKeyEnum.TAG.getName());
-	            Element parentId = parent.element(RuleKeyEnum.ID.getName());
-	            Element parentClass = parent.element(RuleKeyEnum.CLASS.getName());
-	            rule.setParentTag(parentTag.getText());
-	            if(parentId != null){
-	            	rule.setParentTagId(parentId.getText());
+	            if(parent != null){
+	            	Element parentTag = parent.element(RuleKeyEnum.TAG.getName());
+	 	            Element parentId = parent.element(RuleKeyEnum.ID.getName());
+	 	            Element parentClass = parent.element(RuleKeyEnum.CLASS.getName());
+	 	            rule.setParentTag(parentTag.getText());
+	 	            if(parentId != null){
+	 	            	rule.setParentTagId(parentId.getText());
+	 	            }
+	 	            if(parentClass != null){
+	 	            	rule.setParentTagClass(parentClass.getText());
+	 	            }
 	            }
-	            if(parentClass != null){
-	            	rule.setParentTagClass(parentClass.getText());
-	            }
+	           
 	            rules.add(rule);
 			}catch(Exception e){
 				e.printStackTrace();

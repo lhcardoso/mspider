@@ -42,8 +42,6 @@ public class Queue {
 				return null;
 			}
 		}
-		
-		
 	}
 
 	public  boolean isEmpty() {
