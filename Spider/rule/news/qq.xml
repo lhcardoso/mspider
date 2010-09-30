@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rule>
+	<encoding>gb2312</encoding>
+	<title>
+		<tag>h1</tag>
+	</title>
+	<content>
+		<tag>div</tag>
+		<class>Cnt-Main-Article-QQ</class>
+	</content>
+	<parent>
+		<tag>div</tag>
+		<class>hd</class>
+	</parent>
+</rule>
