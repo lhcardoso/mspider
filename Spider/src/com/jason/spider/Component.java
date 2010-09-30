@@ -22,6 +22,10 @@ public abstract class Component {
 		spider = new Spider(POOL_SIZE,queue);
 	}
 	
+	public Queue getQueue(){
+		return this.queue;
+	}
+	
 	public Spider getSpider(){
 		return this.spider;
 	}
