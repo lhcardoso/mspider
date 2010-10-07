@@ -24,7 +24,7 @@ public class PageDownloader {
 	private Object lock = new Object();
 	
 	
-	private String outputPath = "G:/mspider/download";
+	private String outputPath = "E:/mspider/download";
 
 	
 	public PageDownloader(int downerSize){
