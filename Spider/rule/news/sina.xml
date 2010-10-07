@@ -9,5 +9,8 @@
  			<tag>div</tag>
  			<class>artibody</class>
  	</content>
+ 	<download>
+ 		<isdownload>yes</isdownload>
+ 	</download>
  	
  </rule>
