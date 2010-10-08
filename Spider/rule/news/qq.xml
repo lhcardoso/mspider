@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
  <rule>
  	<encoding>gb2312</encoding>
+ 	<entrance>
+ 		http://news.qq.com/a/20101007/000003.htm
+ 	</entrance>
  	<title>
  			<tag>h1</tag>
  	</title>
@@ -13,7 +16,7 @@
  		<class>hd</class>
  	</parent>
  	<download>
- 		<isdownload>yes</isdownload>
+ 		<isdownload>no</isdownload>
  	</download>
  	
  </rule>

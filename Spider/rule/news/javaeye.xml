@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
  <rule>
  	<encoding>UTF-8</encoding>
+ 	<entrance>
+ 		http://www.javaeye.com/news/17882
+ 	</entrance>
  	<title>
  			<tag>h3</tag>
  	</title>
