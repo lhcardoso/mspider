@@ -105,6 +105,10 @@ public class NewsComponent extends Component{
 	            Element rootNode = document.getRootElement();
 	            String encoding = rootNode.element(RuleKeyEnum.ENCODING.getName()).getText();
 	            rule.setEncoding(encoding);
+	            String entrance = rootNode.element(RuleKeyEnum.ENTRANCE.getName()).getText();
+	            if(entrance != null){
+	            	rule.setEntrance(entrance);
+	            }
 	            Element title = rootNode.element(RuleKeyEnum.TITLE.getName());
 	            Element titleTag = title.element(RuleKeyEnum.TAG.getName());
 	            Element titleId = title.element(RuleKeyEnum.ID.getName());

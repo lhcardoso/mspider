@@ -12,14 +12,9 @@ public class Spider {
 	private ExecutorService executor;
 	
 	
-	private Object lock = new Object();
 	
-	private Queue queue;
-	
-	
-	public Spider(int poolSize,Queue queue){
+	public Spider(int poolSize){
 		executor = Executors.newFixedThreadPool(poolSize);
-		this.queue = queue;
 	}
 	
 	public void addParser(Parser parser){
@@ -40,11 +35,7 @@ public class Spider {
 		}
 		
 		public void run() {
-			while(isActivite){
-				String url = queue.get();
-				parser.process(url,queue);
-			}
-			
+			parser.process();
 		}
 	}
 

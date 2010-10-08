@@ -19,7 +19,7 @@ public abstract class Component {
 	public Component(){
 		this.queue = new Queue();
 		this.downloader = new PageDownloader(POOL_SIZE);
-		spider = new Spider(POOL_SIZE,queue);
+		spider = new Spider(POOL_SIZE);
 	}
 	
 	public Queue getQueue(){
@@ -34,9 +34,6 @@ public abstract class Component {
 		return this.downloader;
 	}
 	
-	public void addUrl(String url){
-		queue.add(url);
-	}
 	
 	public void fire(){
 		List<Parser> parsers = buildRules();

@@ -4,6 +4,7 @@ public enum RuleKeyEnum {
 	RULE("rule"),
 	DOWNLOAD("download"),
 	ISDOWNLOAD("isdownload"),
+	ENTRANCE("entrance"),
 	ENCODING("encoding"),
 	TITLE("title"),
 	CONTENT("content"),
