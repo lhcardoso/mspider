@@ -8,6 +8,6 @@ public interface Parser {
 	
 	public void setRule(Rule rule);
 	
-	public Msg process(String url,Queue queue);
+	public Msg process();
 
 }

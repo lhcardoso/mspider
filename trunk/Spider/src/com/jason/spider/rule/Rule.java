@@ -2,6 +2,8 @@ package com.jason.spider.rule;
 
 public class Rule {
 	
+	private String entrance;
+	
 	private boolean downPage;
 
 	public boolean isDownPage() {
@@ -10,6 +12,14 @@ public class Rule {
 
 	public void setDownPage(boolean downPage) {
 		this.downPage = downPage;
+	}
+
+	public String getEntrance() {
+		return entrance;
+	}
+
+	public void setEntrance(String entrance) {
+		this.entrance = entrance;
 	}
 	
 	
