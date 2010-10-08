@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
  <rule>
  	<encoding>UTF-8</encoding>
+ 	<entrance>
+ 		http://cloud.csdn.net/a/20100930/280106.html
+ 	</entrance>
  	<title>
  			<tag>h1</tag>
  	</title>

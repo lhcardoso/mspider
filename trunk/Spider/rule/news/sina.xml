@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
  <rule>
  	<encoding>gb2312</encoding>
+ 	<entrance>
+ 		http://gd.news.sina.com.cn/news/2010/09/30/1011159.html
+ 	</entrance>
  	<title>
  			<tag>h1</tag>
  			<id>artibodyTitle</id>
